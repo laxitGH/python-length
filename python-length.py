@@ -72,58 +72,6 @@ class Length:
         """
         unit = self.__get_checked_input_unit(unit=unit)
         self.__unit = unit
-
-    def extend_by(self, value: float | int | str, /, unit: str | UnitType = None) -> None:
-        """
-        Extend Length object by a specified value.
-
-        Paramters:
-        ----------
-        param1: (required) amount to extend by
-        param2: (optional) unitType of the amount to extend by. By default = None
-        """
-        unit = self.__get_checked_input_unit(unit=unit)
-        value = self.__get_checked_input_value(value=value)
-
-        if not unit:
-            unit = self.__unit
-        value = float(value * self.__CONVERSION_FACTOR[unit])
-        
-        new_value, _ = self.__addition_subtraction_helper(
-            self_value=self.__value,
-            self_unit=self.UnitType.METER.value,
-            other_value=value,
-            other_unit=self.UnitType.METER.value,
-            operation=operator.add
-        )
-
-        self.__value = new_value
-
-    def shrink_by(self, value: float | int | str, /, unit: str | UnitType = None) -> None:
-        """
-        Shrink Length object by a specified value.
-
-        Paramters:
-        ----------
-        param1: (required) amount to shrink by
-        param2: (optional) unitType of the amount to shrink by. By default = None
-        """
-        unit = self.__get_checked_input_unit(unit=unit)
-        value = self.__get_checked_input_value(value=value)
-
-        if not unit:
-            unit = self.__unit
-        value = float(value * self.__CONVERSION_FACTOR[unit])
-        
-        new_value, _ = self.__addition_subtraction_helper(
-            self_value=self.__value,
-            self_unit=self.UnitType.METER.value,
-            other_value=value,
-            other_unit=self.UnitType.METER.value,
-            operation=operator.sub
-        )
-
-        self.__value = new_value
     
     @property
     def value(self) -> float:
@@ -192,34 +140,61 @@ class Length:
         )
         return Length(new_value, unit=new_unit)
 
+    # dunder method for multiplying Length object by a factor, returns new Length object
+    def __mul__(self, scalar: int | float | str) -> Length:
+        scalar = self.__get_checked_input_value(
+            value=scalar,
+            label="Length Multiplication Factor"
+        )
+        return Length(float(self.value * scalar), unit=self.unit)
+    
+    # dunder method for dividing Length object by a factor, returns new Length object
+    def __truediv__(self, scalar: int | float | str) -> Length:
+        scalar = self.__get_checked_input_value(
+            value=scalar,
+            label="Length Division Factor"
+        )
+        return Length(float(self.value / scalar), unit=self.unit)
+    
+    # dunder method for int-dividing Length object by a factor, returns new Length object
+    def __floordiv__(self, scalar: int | float | str) -> Length:
+        scalar = self.__get_checked_input_value(
+            value=scalar,
+            label="Length Division Factor"
+        )
+        return Length(float(self.value // scalar), unit=self.unit)
+    
+    # dunder method for checking if Length object is strictly shorter than other Length object
+    def __lt__(self, other: Length) -> bool:
+        self_value = float(self.value * self.__CONVERSION_FACTOR[self.unit])
+        other_value = float(other.value * self.__CONVERSION_FACTOR[other.unit])
 
-# l1 = Length(103)
-# l2 = Length(7, unit=Length.UnitType.KILOMETER)
-# print(l1, l2)
-# print()
+        return self_value < other_value
+    
+    # dunder method for checking if Length object is shorter than or equals to other Length object
+    def __le__(self, other: Length) -> bool:
+        self_value = float(self.value * self.__CONVERSION_FACTOR[self.unit])
+        other_value = float(other.value * self.__CONVERSION_FACTOR[other.unit])
 
-# l3 = l1 + l2
-# print("addition1:", l3)
-# l3 = l2 + l1
-# print("addition2:", l3)
-# l3 = l1 - l2
-# print("subtraction1:", l3)
-# l3 = l2 - l1
-# print("subtraction2:", l3)
-# print()
+        return self_value <= other_value
+    
+    # dunder method for checking if Length object is strictly greater than other Length object
+    def __gt__(self, other: Length) -> bool:
+        self_value = float(self.value * self.__CONVERSION_FACTOR[self.unit])
+        other_value = float(other.value * self.__CONVERSION_FACTOR[other.unit])
 
-# l3.convert_to(Length.UnitType.KILOMETER.value)
-# print("convert1:", l3)
-# print()
+        return self_value > other_value
+    
+    # dunder method for checking if Length object is greater than or equals to other Length object
+    def __ge__(self, other: Length) -> bool:
+        self_value = float(self.value * self.__CONVERSION_FACTOR[self.unit])
+        other_value = float(other.value * self.__CONVERSION_FACTOR[other.unit])
 
-# l3.extend_by(1)
-# print("extend1:", l3)
-# l3.extend_by(101, unit=Length.UnitType.MILIMETER)
-# print("extend2:", l3)
-# print()
+        return self_value >= other_value
+    
+    # dunder method for checking if Length object is equals to other Length object
+    def __eq__(self, other: Length) -> bool:
+        self_value = float(self.value * self.__CONVERSION_FACTOR[self.unit])
+        other_value = float(other.value * self.__CONVERSION_FACTOR[other.unit])
 
-# l3.shrink_by(2)
-# print("shrink1:", l3)
-# l3.shrink_by(303, unit=Length.UnitType.MILIMETER)
-# print("shrink2:", l3)
-# print()
+        return self_value == other_value
